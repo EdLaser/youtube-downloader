@@ -40,9 +40,15 @@
         </div>
         <div class="space-x-4">
           <NuxtLink to="/download">
-            <Button class="bg-white text-purple-600 hover:bg-gray-100"
-              >Get your Music now</Button
+            <Button
+              class="bg-white text-xl font-semibold hover:bg-white hover:scale-110 transition-all group duration-300"
             >
+              <span
+                class="bg-gradient-to-l from-fuchsia-500 to-cyan-500 group-hover:bg-gradient-to-r text-transparent bg-clip-text"
+              >
+                Get your Music now
+              </span>
+            </Button>
           </NuxtLink>
         </div>
       </div>
