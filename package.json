@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@googleapis/youtube": "^20.0.0",
     "@nuxt/fonts": "^0.9.2",
     "@nuxt/image": "^1.8.1",
     "@nuxtjs/tailwindcss": "^6.12.1",

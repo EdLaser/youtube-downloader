@@ -21,9 +21,9 @@
           </Button>
         </div>
       </CardHeader>
-      <CardContent class="p-0 mb-10">
+      <CardContent class="p-0 mb-10" v-if="videoUrl">
         <Separator :label="randomEmoji" class="my-8" />
-        <div class="flex flex-col md:flex-row">
+        <div class="flex flex-col md:flex-row min-h-52">
           <template v-if="isLoading">
             <div
               class="w-full md:w-1/2 aspect-video bg-gray-200 animate-pulse"
@@ -34,6 +34,7 @@
               :src="thumbnailUrl"
               alt="Music video thumbnail"
               class="w-full md:w-1/2 aspect-video object-cover rounded-md"
+              v-if="thumbnailUrl"
             />
           </template>
           <div class="p-6 w-full md:w-1/2 space-y-4">
@@ -104,18 +105,40 @@ const randomEmoji = useState(
   "randomEmoji",
   () => emojiLabels[Math.floor(Math.random() * emojiLabels.length)]
 );
+
 const isLoading = ref(false);
 const videoUrl = ref("");
-const thumbnailUrl = computed(() => {
+const videoId = computed(() => {
   if (!videoUrl.value) return "";
-  console.log(`https://img.youtube.com/vi/${videoUrl.value.split("v=")[1]}/maxresdefault.jpg`);
-  return `https://img.youtube.com/vi/${videoUrl.value.split("v=")[1]}/maxresdefault.jpg`;
+  return videoUrl.value.split("v=")[1];
+});
+const thumbnailUrl = computed(() => {
+  if (!videoId.value) return "";
+  return `https://img.youtube.com/vi/${videoId.value}/maxresdefault.jpg`;
 });
 
-const handleGetInfo = () => {
+const router = useRouter();
+
+watch(videoId, (newVal) => {
+  if (newVal) {
+    router.push({ query: { videoId: newVal } });
+  } else {
+    router.push({ query: {} });
+  }
+});
+
+const handleGetInfo = async () => {
   isLoading.value = true;
-  setTimeout(() => {
+  try {
+    const result = await $fetch("/api/video-info", {
+      method: "POST",
+      body: JSON.stringify({ videoId: videoId.value }),
+    });
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  } finally {
     isLoading.value = false;
-  }, 2000);
+  }
 };
 </script>
