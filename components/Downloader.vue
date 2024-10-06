@@ -21,7 +21,7 @@
           </Button>
         </div>
       </CardHeader>
-      <CardContent class="p-0 mb-10" v-if="videoUrl">
+      <CardContent class="p-0 mb-10" v-if="videoInfo">
         <Separator :label="randomEmoji" class="my-8" />
         <div class="flex flex-col md:flex-row min-h-52">
           <template v-if="isLoading">
@@ -47,13 +47,8 @@
               </div>
             </template>
             <template v-else>
-              <h2 class="text-2xl font-semibold">Shape of You - Ed Sheeran</h2>
-              <p class="text-sm text-gray-600">
-                "Shape of You" is a hit song by English singer-songwriter Ed
-                Sheeran. It was released as a digital download on 6 January 2017
-                as one of the double lead singles from his third studio album ÷
-                (2017).
-              </p>
+              <h2 class="text-2xl font-semibold">{{ videoInfo.title }}</h2>
+              <p class="text-sm text-gray-600">{{ videoInfo.description }}</p>
               <div class="flex justify-between text-sm text-gray-500">
                 <span>3,456,789,012 views</span>
                 <span>23,456,789 likes</span>
@@ -83,7 +78,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,6 +86,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, RefreshCw, Loader2 } from "lucide-vue-next";
 import { Progress } from "@/components/ui/progress";
+import type { youtube_v3 } from "@googleapis/youtube";
 
 const emojiLabels = [
   "ᕕ(⌐■_■)ᕗ ♪♬",
@@ -105,9 +101,16 @@ const randomEmoji = useState(
   "randomEmoji",
   () => emojiLabels[Math.floor(Math.random() * emojiLabels.length)]
 );
+const router = useRouter();
+const route = useRoute();
 
 const isLoading = ref(false);
-const videoUrl = ref("");
+const videoUrl = ref(
+  route.query.videoId
+    ? `https://www.youtube.com/watch?v=${route.query.videoId as string}`
+    : ""
+);
+const videoInfo = ref<youtube_v3.Schema$VideoSnippet | null>(null);
 const videoId = computed(() => {
   if (!videoUrl.value) return "";
   return videoUrl.value.split("v=")[1];
@@ -116,8 +119,6 @@ const thumbnailUrl = computed(() => {
   if (!videoId.value) return "";
   return `https://img.youtube.com/vi/${videoId.value}/maxresdefault.jpg`;
 });
-
-const router = useRouter();
 
 watch(videoId, (newVal) => {
   if (newVal) {
@@ -135,6 +136,7 @@ const handleGetInfo = async () => {
       body: JSON.stringify({ videoId: videoId.value }),
     });
     console.log(result);
+    videoInfo.value = result;
   } catch (error) {
     console.error(error);
   } finally {
