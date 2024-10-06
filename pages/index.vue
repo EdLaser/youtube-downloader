@@ -43,7 +43,7 @@
         </div>
       </div>
       <div class="mt-14">
-        <NuxtLink to="/">
+        <NuxtLink to="/download">
           <Button
             class="bg-white text-2xl font-semibold hover:bg-white hover:scale-110 transition-all group duration-300 p-7"
           >
